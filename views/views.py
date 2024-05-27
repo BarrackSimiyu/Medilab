@@ -28,7 +28,7 @@ class MemberSignup( Resource ):
             cursor = connection.cursor()
             # insert into database
             sql = "INSERT INTO `members` (`surname`, `others`, `gender`, `email`, `contact_no`, `dob`, `status`, `password`, `location_id`) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            data = (surname, others, gender, email, contact_no, dob, status, password, location_id)
+            data = (surname, others, gender, email, contact_no, dob, status, hash_password(password), location_id)
             try:
                 cursor.execute( sql, data )
                 connection.commit()
@@ -41,5 +41,35 @@ class MemberSignup( Resource ):
             
         else:
             return jsonify({"message": response})
+        
+class MemberSignin(Resource):
+    def post(self):
+        # get request from client
+        data =  request.json
+        email = data["email"]
+        password = data["password"]
+
+        # connect to db
+        connection = pymysql.connect( host = "localhost", user = "root", password = "", database = "Medilab" )
+        
+        # check if email exists
+        sql = "SELECT * FROM `members` WHERE `email` = %s"
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        cursor.execute( sql, email )
+        if cursor.rowcount == 0:
+            return  jsonify( { "message" : "Email does not exist" } )
+        else:
+            # check password
+            member = cursor.fetchone()
+            hashed_password = member["password"]
+            is_matchpassword = verify_password(password, hashed_password)
+        if is_matchpassword == True:
+                return jsonify( { "message" : "Login Successful" } )
+        elif is_matchpassword == False:
+           return jsonify({"message": "Login Failed"})
+        else:
+            return jsonify({"message":"Something went wrong"})
+
+
         
         
