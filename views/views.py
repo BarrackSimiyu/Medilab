@@ -111,6 +111,24 @@ class AddDependant(Resource):
         except:
             connection.rollback()
             return jsonify ( { "message" : "Post Failed.Dependant not saved." } )
+        
+
+class ViewDependant(Resource):
+    def post(self):
+         data = request.json
+         member_id=data["member_id"]
+    # connect to db
+         connection = pymysql.connect( host = "localhost", user = "root", password = "", database = "Medilab" )
+         sql = "SELECT * FROM `dependants` WHERE `member_id` = %s"
+         cursor = connection.cursor(pymysql.cursors.DictCursor)
+         cursor.execute( sql, member_id )
+         count = cursor.rowcount
+         if count == 0:
+                return jsonify ( { "message" : "Member does not exist" } )
+         else:
+                member = cursor.fetchall()
+                return jsonify ({"message":  member})
+
 
 
         
