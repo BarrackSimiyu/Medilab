@@ -156,6 +156,29 @@ class ViewLabTest(Resource):
         else:
                 labtest = cursor.fetchall()
                 return jsonify ({"message":  labtest})
+        
+
+class ViewLabBookings(Resource):
+     @jwt_required(fresh=True)
+     def post(self):
+          
+          data = request.json
+          lab_id = data["lab_id"]
+          connection =  pymysql.connect( host = "localhost", user = "root", password = "", database = "Medilab" )
+          cursor = connection.cursor(pymysql.cursors.DictCursor)
+          sql = "SELECT  * FROM `bookings` WHERE `lab_id` = %s"
+          data = (lab_id)
+          cursor.execute( sql, data )
+          if cursor.rowcount == 0:
+               return jsonify  ( { "message" : "No bookings found." } )
+          else:
+               bookings = cursor.fetchall()
+               import json
+                # we pass our bookings to json.dumps
+               our_bookings = json.dumps( bookings, indent=1,sort_keys= True, default= str )
+               return json.loads (our_bookings)
+
+
          
         
 
