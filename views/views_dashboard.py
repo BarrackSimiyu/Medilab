@@ -173,10 +173,71 @@ class ViewLabBookings(Resource):
                return jsonify  ( { "message" : "No bookings found." } )
           else:
                bookings = cursor.fetchall()
+            #    associate member_id with the booking 
+            #    we want to loop all the bookings 
+               #    and then loop all the members
+               for  booking in bookings:
+                    member_id = booking["member_id"]
+                    # return jsonify (member_id)
+                    sql = "SELECT * FROM `members` WHERE `member_id` = %s"
+                    cursor = connection.cursor(pymysql.cursors.DictCursor)
+                    cursor.execute( sql, member_id )
+                    member = cursor.fetchone()
+                    # The result is attached  to the booking dictionary under key
+                    booking['key'] = member
+                    # return jsonify (member)
                import json
                 # we pass our bookings to json.dumps
                our_bookings = json.dumps( bookings, indent=1,sort_keys= True, default= str )
                return json.loads (our_bookings)
+          
+
+
+class AddNurse(Resource):
+     @jwt_required(fresh=True)
+     def post(self):
+          data = request.json
+
+          surname = data["surname"]
+          others = data["others"]
+          gender = data["gender"]
+          lab_id = data["lab_id"]
+
+          connection =   pymysql.connect( host = "localhost", user = "root", password = "", database = "Medilab" )
+          cursor = connection.cursor()
+          sql = "INSERT INTO `nurses` (`surname`, `others`, `gender`, `lab_id`) VALUES (%s, %s, %s, %s)"
+          data = (surname, others, gender, lab_id)
+
+          try:
+               cursor.execute( sql, data )
+               connection.commit()
+               return jsonify ({"message" : "Nurse added successfully."})
+          except:
+               connection.rollback()
+               return jsonify ({"message" : "Nurse not added."})
+          
+
+
+class ViewNurse(Resource):
+     @jwt_required(fresh=True)
+     def post(self):
+          data = request.json
+          nurse_id = data["nurse_id"]
+
+          connection =    pymysql.connect( host = "localhost", user = "root", password = "", database = "Medilab" )
+          cursor = connection.cursor(pymysql.cursors.DictCursor)
+          sql = "SELECT * FROM `nurses` WHERE `nurse_id` = %s"
+          data = (nurse_id)
+          cursor.execute( sql, data )
+          count = cursor.rowcount
+          if count == 0:
+                return jsonify ( { "message" : "Nurse does not exist." } )
+          else:
+                nurse = cursor.fetchone()
+                return jsonify ({"message":  nurse})
+
+          
+
 
 
          

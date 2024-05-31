@@ -15,7 +15,7 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] =  timedelta( days = 30)
 jwt = JWTManager (app)
 # endpoints /routes 
 from views.views import MemberSignup,MemberSignin,Memberprofile,AddDependant,ViewDependant,Laboratories,LabTests,MakeBooking,MyBookings,Payment
-from views.views_dashboard import LabSignUp,LabSignIn,ViewLabProfile,AddLabTest,ViewLabTest,ViewLabBookings
+from views.views_dashboard import LabSignUp,LabSignIn,ViewLabProfile,AddLabTest,ViewLabTest,ViewLabBookings,AddNurse,ViewNurse
 api.add_resource(MemberSignup, '/api/member_signup')
 api.add_resource( MemberSignin, '/api/member_signin' )
 api.add_resource(Memberprofile,'/api/member_profile')
@@ -32,6 +32,8 @@ api.add_resource(ViewLabProfile, '/api/lab_profile')
 api.add_resource(AddLabTest,'/api/add_lab_test')
 api.add_resource(ViewLabTest,'/api/view_labtest')
 api.add_resource(ViewLabBookings, '/api/view_lab_bookings')
+api.add_resource(AddNurse,'/api/add_nurse')
+api.add_resource( ViewNurse,'/api/view_nurse')
 
 if __name__== '__main__':
     
