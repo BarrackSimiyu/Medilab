@@ -108,6 +108,56 @@ class ViewLabProfile(Resource):
          else:
                 lab = cursor.fetchone()
                 return jsonify ({"message":  lab})
+         
+
+
+class AddLabTest(Resource):
+    @jwt_required(fresh=True)
+    def post(self):
+        data = request.json
+        lab_id = data["lab_id"]
+        test_name = data["test_name"]
+        test_description = data["test_description"]
+        test_cost = data["test_cost"]
+        test_discount = data["test_discount"]
+        connection = pymysql.connect( host = "localhost", user = "root", password = "", database = "Medilab" )
+        
+        
+        sql = "INSERT into lab_tests (lab_id,test_name,test_description,test_cost,test_discount) values (%s,%s,%s,%s,%s)"
+
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        data = (lab_id,test_name,test_description,test_cost,test_discount)
+
+        try:
+            cursor.execute( sql, data )
+            connection.commit()
+            return  jsonify ( { "message" : "Test added successfully" } )
+        except:
+            return   jsonify ( { "message" : "Test Addition Failed" } )
+        
+
+class ViewLabTest(Resource):
+    @jwt_required(fresh=True)
+    def post(self):
+        data = request.json
+
+        lab_id = data["lab_id"]
+
+        connection =  pymysql.connect( host = "localhost", user = "root", password = "", database = "Medilab" )
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        sql = "SELECT  * FROM `lab_tests` WHERE `lab_id` = %s"
+        data = (lab_id)
+
+        
+        cursor.execute(sql,data)
+        count = cursor.rowcount
+        if count == 0:
+                return jsonify ( { "message" : "Lab test does not exist." } )
+        else:
+                labtest = cursor.fetchall()
+                return jsonify ({"message":  labtest})
+         
+        
 
 
 
